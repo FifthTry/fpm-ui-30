@@ -1,5 +1,5 @@
 -- import: fpm
--- import: fpm/processors
+-- import: fpm/processors as pr
 
 -- string $path: hhh
 
@@ -7,38 +7,15 @@
 
 -- optional string $rename-path:
 
-
 -- optional string $rename-title:
 
-/-- object revert-obj:
-function: http
-method: post
-url: -/revert/
-path: $revert-file-path
-operation: delete
+-- optional string $create-file-path:
 
-/-- object sync-obj:
-function: http
-method: get
-url: /-/editor-sync/
+-- optional string $rename-file-path:
 
-/-- object view-obj:
-function: redirect
-url: $path
+-- optional string $new-name:
 
 
-/-- object create-obj:
-function: http
-method: post
-url: $url
-path: $create-file-path
-
-/-- object delete-obj:
-function: http
-method: post
-url: $url
-path: $delete-file-path
-operation: delete
 
 -- void edit-obj(url,method,name):
 string url:
@@ -68,8 +45,17 @@ http(url, method, name, path,value)
 
 -- boolean $show-modification: false
 
--- fpm.toc-item list sample-toc:
-$processor$: fpm.toc
+-- boolean $show-delete-dialog : false
+
+-- boolean $show-overlay: false
+
+-- boolean $show-create-new-file: false
+
+-- boolean $show-rename: false
+
+
+-- pr.toc-item list sample-toc:
+$processor$: pr.toc
 
 -level:
 -level:
@@ -79,8 +65,8 @@ $processor$: fpm.toc
   - level-one: /
 
 
--- fpm.toc-item list fs:
-$processor$: processors.package-tree
+-- pr.toc-item list fs:
+$processor$: pr.package-tree
 
 
 
@@ -91,40 +77,21 @@ $processor$: processors.package-tree
 
 
 
--- editor-main:
-
--- print-toc:
-if: {toc-show}
-toc: $fs
-
-/-- print-sitemap-toc:
-if: {sitemap-show}
-sample-list: $sample-toc
-
--- end: editor-main
 
 
 
-
-
-
--- boolean $show-delete-dialog : false
--- boolean $show-overlay: false
--- boolean $show-create-new-file: false
-
--- boolean $show-rename: false
-
--- component editor-main:
+-- component editor:
+string source: 
+string path: 
 boolean $open: false
-fpm.toc-item list sample-toc:
+pr.toc-item list sample-toc:
 boolean $show-delete-dialog: false
 boolean $show-desktop: false
 boolean $show-mobile: false
 boolean show-fullscreen: false
 boolean show-create-new-folder: false
 boolean $edits: false
-ftd.ui list extra-children:
-children toc-id:
+;; children toc-id:
 
 -- ftd.row:
 background.solid: $inherited.colors.background.step-2
@@ -144,7 +111,7 @@ if: {show-delete-dialog}
 if: {show-create-new-file}
 
 -- folder:
-if: {editor-main.show-create-new-folder}
+if: {editor.show-create-new-folder}
 
 -- ftd.row:
 if: {ftd.device != "mobile"}
@@ -155,18 +122,18 @@ background.solid: $inherited.colors.background.base
 
 -- ftd.column:
 width.fixed.percent: 0
-width.fixed.percent if {!editor-main.open}: 25
-min-width.fixed.px if {!editor-main.open}: 300
+width.fixed.percent if {!editor.open}: 25
+min-width.fixed.px if {!editor.open}: 300
 
 -- ftd.column:
-width.fixed.percent if {!editor-main.open}:  25
-min-width.fixed.px if {!editor-main.open}: 300
+width.fixed.percent if {!editor.open}:  25
+min-width.fixed.px if {!editor.open}: 300
 ;;id: desktop-container
 overflow-x: auto
 height.fixed.calc:  100vh
 anchor: window
 left.px: 0
-left.px if {editor-main.open}: -700
+left.px if {editor.open}: -700
 top.px: 0
 background.solid: $inherited.colors.background.base
 
@@ -235,7 +202,7 @@ border-color: $dark-grey
 width: fill-container
 
 -- print-cr-toc:
-sample-list: $editor-main.sample-toc
+sample-list: $editor.sample-toc
 
 -- end: ftd.row
 
@@ -286,8 +253,12 @@ text-align: center
 -- end: ftd.row
 
 -- ftd.column:
-children: $editor-main.toc-id
+;; children: $editor.toc-id
 width: fill-container
+
+-- print-toc:
+if: { toc-show }
+toc: $fs
 
 -- end: ftd.column
 
@@ -300,8 +271,8 @@ width: fill-container
 -- ftd.row:
 ;;id: left.px-side
 width.fixed.percent: 75
-width.fixed.percent if {editor-main.open}:  100
-width.fixed.percent if {!editor-main.open}:  75
+width.fixed.percent if {editor.open}:  100
+width.fixed.percent if {!editor.open}:  75
 min-height.fixed.calc: 100vh
 ;;align-content: right
 margin-right.px: 0
@@ -322,7 +293,7 @@ padding-vertical.px: 12
 src: $showbar
 width.fixed.px: 20
 height: auto
-$on-click$: $ftd.toggle($a = $editor-main.open)
+$on-click$: $ftd.toggle($a = $editor.open)
 
 -- ftd.row:
 spacing.px: 8
@@ -403,15 +374,15 @@ package base not found. Package: fifthtry.github.io/doc-site, File: filename.png
 width: fill-container
 ;;id: edit-input
 
--- ftd.input:
-if: {editor-main.edits}
+-- ftd.text-input:
+if: {editor.edits}
 width: fill-container
 min-width.fixed.percent: 100
 max-width.fixed.percent: 100
-min-height.fixed.calc if { !show-modification && editor-main.edits}:  100vh - 52px
+min-height.fixed.calc if { !show-modification && editor.edits}:  100vh - 52px
 max-height.fixed.calc:  100vh - 52px
-min-height.fixed.calc if { show-modification && editor-main.edits}:  100vh - 390px
-max-height.fixed.calc if { show-modification && editor-main.edits}:  100vh - 390px
+min-height.fixed.calc if { show-modification && editor.edits}:  100vh - 390px
+max-height.fixed.calc if { show-modification && editor.edits}:  100vh - 390px
 multiline: true
 placeholder: -- ftd.text: hello world
 value: $source
@@ -421,7 +392,7 @@ $on-click$: $ftd.set-bool($a = $show-guide, v = true)
 color: $inherited.colors.text
 role: $inherited.types.fine-print
 background.solid: $inherited.colors.background.base
-white-space: pre
+;;white-space: pre
 
 -- guide-80chars:
 if: {show-guide}
@@ -429,7 +400,7 @@ if: {show-guide}
 -- end: ftd.row
 
 -- ftd.column:
-if: {editor-main.show-desktop}
+if: {editor.show-desktop}
 width: fill-container
 height: fill-container
 background.solid: $inherited.colors.text-strong
@@ -444,7 +415,7 @@ background.solid: $inherited.colors.text-strong
 -- end: ftd.column
 
 -- ftd.row:
-if: {editor-main.show-mobile}
+if: {editor.show-mobile}
 ;;id: mobile-container
 align-content:center
 width : fill-container
@@ -570,56 +541,56 @@ bottom.px: 24
 z-index: 9999
 
 -- ftd.image:
-if: {editor-main.edits}
+if: {editor.edits}
 src: $edit
 width.fixed.px: 20
 height: auto
 $on-click$: $ftd.set-bool($a = $show-guide, v = true)
-$on-click$: $ftd.set-bool($a = $editor-main.show-desktop, v = false)
-$on-click$: $ftd.set-bool($a = $editor-main.show-mobile, v = false)
-$on-click$: $ftd.set-bool($a = $editor-main.edits, v = true)
+$on-click$: $ftd.set-bool($a = $editor.show-desktop, v = false)
+$on-click$: $ftd.set-bool($a = $editor.show-mobile, v = false)
+$on-click$: $ftd.set-bool($a = $editor.edits, v = true)
 ;;$on-click$: $ftd.set-bool($a = $show-guide, v = false)
 
 
 -- ftd.image:
-if: {!editor-main.edits}
+if: {!editor.edits}
 src: $edit-default
 width.fixed.px: 20
 height: auto
 $on-click$: $ftd.set-bool($a = $show-guide, v = true)
-$on-click$: $ftd.set-bool($a = $editor-main.show-desktop, v = false)
-$on-click$: $ftd.set-bool($a = $editor-main.show-mobile, v = false)
-$on-click$: $ftd.set-bool($a = $editor-main.edits, v = true)
+$on-click$: $ftd.set-bool($a = $editor.show-desktop, v = false)
+$on-click$: $ftd.set-bool($a = $editor.show-mobile, v = false)
+$on-click$: $ftd.set-bool($a = $editor.edits, v = true)
 ;;$on-click$: $ftd.set-bool($a = $show-guide, v = false)
 
 -- ftd.image:
-if: { !editor-main.show-mobile}
+if: { !editor.show-mobile}
 src: $mobile
 width.fixed.px: 20
 height: auto
 $on-click$: $ftd.set-bool($a = $show-guide, v = false)
-$on-click$: $ftd.set-bool($a = $editor-main.show-desktop, v = false)
-$on-click$: $ftd.set-bool($a = $editor-main.show-mobile, v = true)
-$on-click$: $ftd.set-bool($a = $editor-main.edits, v = false)
+$on-click$: $ftd.set-bool($a = $editor.show-desktop, v = false)
+$on-click$: $ftd.set-bool($a = $editor.show-mobile, v = true)
+$on-click$: $ftd.set-bool($a = $editor.edits, v = false)
 
 -- ftd.image:
-if: {editor-main.show-mobile}
+if: {editor.show-mobile}
 src: $mobile-active
 width.fixed.px: 20
 height: auto
 
 -- ftd.image:
-if: {!editor-main.show-desktop}
+if: {!editor.show-desktop}
 src: $desktop
 width.fixed.px: 20
 height: auto
-$on-click$: $ftd.toggle($a = $editor-main.show-desktop)
-$on-click$: $ftd.set-bool($a = $editor-main.show-mobile, v = false)
-$on-click$: $ftd.set-bool($a = $editor-main.edits, v = false)
+$on-click$: $ftd.toggle($a = $editor.show-desktop)
+$on-click$: $ftd.set-bool($a = $editor.show-mobile, v = false)
+$on-click$: $ftd.set-bool($a = $editor.edits, v = false)
 $on-click$: $ftd.set-bool($a = $show-guide, v = false)
 
 -- ftd.image:
-if: {editor-main.show-desktop}
+if: {editor.show-desktop}
 src: $desktop-active
 width.fixed.px: 20
 height: auto
@@ -634,7 +605,7 @@ height: auto
 
 -- end: ftd.row
 
--- end: editor-main
+-- end: editor
 
 
 
@@ -685,7 +656,7 @@ margin-bottom.px: 8
 width: fill-container
 ;;id: code-container
 
-/-- ftd.input:
+/-- ftd.text-input:
 width: fill-container
 min-width.fixed.percent: 100
 min-height.fixed.px: 250
@@ -737,6 +708,11 @@ $on-click$: $ftd.set-bool($a = $dialog-open, v = false)
 
 
 
+
+
+
+
+
 -- component error-card:
 caption title:
 body body:
@@ -767,7 +743,10 @@ color: $red-text
 
 
 
--- optional string $create-file-path:
+
+
+
+
 
 
 -- component new-file:
@@ -803,7 +782,7 @@ white-space: nowrap
 width: fill-container
 background.solid: $inherited.colors.background.step-1
 
--- ftd.input:
+-- ftd.text-input:
 width: fill-container
 placeholder: filename.ftd
 $on-input$: $ftd.set-string($a=$create-file-path, v=$VALUE)
@@ -843,7 +822,6 @@ height.fixed.px: 8
 $on-click$: $ftd.set-bool($a = $show-create-new-file, v = false)
 $on-click$: $ftd.set-bool($a = $dialog-open, v = false)
 $on-click$: $ftd.set-bool($a = $show-overlay, v = false)
-
 
 -- end: ftd.row
 
@@ -895,7 +873,7 @@ white-space: nowrap
 width: fill-container
 background.solid: $inherited.colors.background.step-1
 
-/-- ftd.input:
+/-- ftd.text-input:
 width: fill-container
 placeholder: folder name
 $on-input$: $create-file-path=$VALUE
@@ -948,12 +926,6 @@ height.fixed.px: 8
 
 
 
--- optional string $rename-file-path:
-
-
--- optional string $new-name:
-
-
 
 
 
@@ -990,7 +962,7 @@ text-align: center
 width: fill-container
 background.solid: $inherited.colors.background.step-1
 
--- ftd.input:
+-- ftd.text-input:
 width: fill-container
 value: $rename-title
 placeholder: $rename-title
@@ -1029,7 +1001,6 @@ width.fixed.px: 8
 height.fixed.px: 8
 $on-click$: $ftd.set-bool($a= $show-rename , v = false)
 $on-click$: $ftd.set-bool($a= $dialog-open , v = false)
-
 
 -- end: ftd.row
 
@@ -1076,7 +1047,7 @@ z-index: 9999
 
 
 -- component print-cr-toc:
-fpm.toc-item list sample-list:
+pr.toc-item list sample-list:
 boolean open: true
 
 -- ftd.column:
@@ -1174,7 +1145,7 @@ url: $obj.url
 -- component print-cr-toc-item:
 caption title:
 optional string url:
-fpm.toc-item list children:
+pr.toc-item list children:
 boolean show-actions: false
 boolean show-tooltip: false
 boolean show: false
@@ -1421,7 +1392,7 @@ z-index: 9999
 
 
 -- component print-toc:
-fpm.toc-item list toc:
+pr.toc-item list toc:
 
 -- ftd.column:
 width: fill-container
@@ -1445,7 +1416,7 @@ is-first: true
 
 
 -- component print-toc-item:
-fpm.toc-item toc:
+pr.toc-item toc:
 boolean is-first: false
 boolean $show-actions: false
 boolean $show: false
