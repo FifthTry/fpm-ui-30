@@ -1,1 +1,2079 @@
--- ftd.text: Hello World
+-- import: fpm
+-- import: fpm/processors
+
+-- string $path: hhh
+
+-- optional string $source:
+
+-- optional string $rename-path:
+
+
+-- optional string $rename-title:
+
+/-- object revert-obj:
+function: http
+method: post
+url: -/revert/
+path: $revert-file-path
+operation: delete
+
+/-- object sync-obj:
+function: http
+method: get
+url: /-/editor-sync/
+
+/-- object view-obj:
+function: redirect
+url: $path
+
+
+/-- object create-obj:
+function: http
+method: post
+url: $url
+path: $create-file-path
+
+/-- object delete-obj:
+function: http
+method: post
+url: $url
+path: $delete-file-path
+operation: delete
+
+-- void edit-obj(url,method,name):
+string url:
+string method:
+string name:
+string path:
+string value:
+
+http(url, method, name, path,value)
+
+
+-- boolean show-action-on-status: true
+
+-- boolean $show-conflict: false
+
+-- boolean $dialog-open: false
+
+-- boolean show-cr-ui: false
+
+-- boolean sitemap-show: false
+
+-- boolean toc-show: true
+
+-- boolean show-server-actions: false
+
+-- boolean $show-guide: false
+
+-- boolean $show-modification: false
+
+-- fpm.toc-item list sample-toc:
+$processor$: fpm.toc
+
+-level:
+-level:
+- level:
+  - item-one: /
+  - item-two: /
+  - level-one: /
+
+
+-- fpm.toc-item list fs:
+$processor$: processors.package-tree
+
+
+
+
+
+
+
+
+
+
+-- editor-main:
+
+-- print-toc:
+if: {toc-show}
+toc: $fs
+
+/-- print-sitemap-toc:
+if: {sitemap-show}
+sample-list: $sample-toc
+
+-- end: editor-main
+
+
+
+
+
+
+-- boolean $show-delete-dialog : false
+-- boolean $show-overlay: false
+-- boolean $show-create-new-file: false
+
+-- boolean $show-rename: false
+
+-- component editor-main:
+boolean $open: false
+fpm.toc-item list sample-toc:
+boolean $show-delete-dialog: false
+boolean $show-desktop: false
+boolean $show-mobile: false
+boolean show-fullscreen: false
+boolean show-create-new-folder: false
+boolean $edits: false
+ftd.ui list extra-children:
+children toc-id:
+
+-- ftd.row:
+background.solid: $inherited.colors.background.step-2
+color: $inherited.colors.text-strong
+width: fill-container
+height: fill-container
+;;open: true
+;;append-at: toc-id
+
+-- display-rename:
+if: {show-rename}
+
+-- delete-confimation:
+if: {show-delete-dialog}
+
+-- new-file:
+if: {show-create-new-file}
+
+-- folder:
+if: {editor-main.show-create-new-folder}
+
+-- ftd.row:
+if: {ftd.device != "mobile"}
+width: fill-container
+height: hug-content
+;;id: mobile-side
+background.solid: $inherited.colors.background.base
+
+-- ftd.column:
+width.fixed.percent: 0
+width.fixed.percent if {!editor-main.open}: 25
+min-width.fixed.px if {!editor-main.open}: 300
+
+-- ftd.column:
+width.fixed.percent if {!editor-main.open}:  25
+min-width.fixed.px if {!editor-main.open}: 300
+;;id: desktop-container
+overflow-x: auto
+height.fixed.calc:  100vh
+anchor: window
+left.px: 0
+left.px if {editor-main.open}: -700
+top.px: 0
+background.solid: $inherited.colors.background.base
+
+-- ftd.row:
+background.solid: $grey-dark
+padding-vertical.px: 12
+padding-horizontal.px: 12
+width: fill-container
+;;$on-mouse-enter$: $show-server-actions = true
+;;$on-mouse-leave$: $show-server-actions = false
+
+-- ftd.text: TEST
+role: $inherited.types.copy-tight
+color: $inherited.colors.text-strong
+width: fill-container
+
+-- ftd.row:
+if: {show-server-actions}
+spacing.px: 25
+align-content:right
+anchor: parent
+right.px: 20
+top.px: 10
+
+-- ftd.image:
+src: $sync-img
+;;$on-click$: message-host $sync-obj
+
+-- ftd.image:
+src: $refresh
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {show-cr-ui}
+;;id: change-request
+width: fill-container
+background.solid: $dark-grey
+color: $inherited.colors.text-strong
+padding-vertical.px: 12
+padding-left.px: 12
+padding-right.px: 54
+spacing.px:4
+
+-- ftd.image:
+src: $pull-request-icon
+width.fixed.px: 16
+margin-top.px: 2
+
+-- change-request-text:
+cr-number: #8
+cr-title: cr-title-it-can-be-short-it-can-be-long-in-that-case-we-do-line-break
+url: /somecrlink
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {show-cr-ui}
+padding-top.px: 15
+padding-left.px: 14
+padding-bottom.px: 14
+;;border-bottom-width.px: 4
+border-color: $dark-grey
+width: fill-container
+
+-- print-cr-toc:
+sample-list: $editor-main.sample-toc
+
+-- end: ftd.row
+
+-- ftd.column:
+width: fill-container
+padding-top.px if {show-cr-ui}: 8
+
+-- ftd.row:
+width: fill-container
+;;id: text-container
+
+-- ftd.row:
+width: fill-container
+;;$on-click$: $toc-show= true
+;;$on-click$: $sitemap-show= false
+background.solid if {sitemap-show}: $inherited.colors.background.step-1
+border-bottom-width.px if {sitemap-show}: 1
+border-color if {sitemap-show}: $inherited.colors.border-strong
+padding-vertical.px: 8
+padding-horizontal.px: 16
+
+-- ftd.text: All files
+color: $folder-color
+role: $inherited.types.fine-print
+width: fill-container
+;;text-align:center
+
+-- end: ftd.row
+
+/-- ftd.row:
+width: fill-container
+;;$on-click$: $toc-show= false
+;;$on-click$: $sitemap-show= true
+background.solid if {toc-show}: $inherited.colors.background.step-1
+border-bottom-width.px if {toc-show}: 1
+border-color if {toc-show}: $inherited.colors.border-strong
+padding-vertical.px: 8
+padding-horizontal.px: 16
+
+/-- ftd.text: Sitemap
+color: $folder-color
+role: $inherited.types.fine-print
+width: fill-container
+text-align: center
+
+/-- end: ftd.row
+
+-- end: ftd.row
+
+-- ftd.column:
+children: $editor-main.toc-id
+width: fill-container
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- ftd.row:
+;;id: left.px-side
+width.fixed.percent: 75
+width.fixed.percent if {editor-main.open}:  100
+width.fixed.percent if {!editor-main.open}:  75
+min-height.fixed.calc: 100vh
+;;align-content: right
+margin-right.px: 0
+background.solid: $inherited.colors.background.step-1
+
+-- ftd.column:
+width.fixed.calc:  100% - 12px
+;;id: switch-container
+padding-left.px: 16
+
+-- ftd.row:
+width: fill-container
+;;id: show-container
+spacing.px: 18
+padding-vertical.px: 12
+
+-- ftd.image:
+src: $showbar
+width.fixed.px: 20
+height: auto
+$on-click$: $ftd.toggle($a = $editor-main.open)
+
+-- ftd.row:
+spacing.px: 8
+
+-- ftd.text: $path
+role: $inherited.types.fine-print
+color: $inherited.colors.cta-primary.base
+
+/-- ftd.text: (Preview)
+role: $inherited.types.fine-print
+color: $inherited.colors.cta-primary.base
+white-space: nowrap
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- ftd.column:
+;;id: code-container
+width: fill-container
+
+-- ftd.column:
+margin-bottom.px: 0
+margin-bottom.px if {show-modification}: 20
+width: fill-container
+min-height.fixed.px: 0
+min-height.fixed.px if {show-modification}: 300
+overflow-y: auto
+
+-- change-card:
+if: {show-modification}
+change: MERGE
+
+- While we love `fpm`, it is this `fpm` not the right
+- tool for you. We document some of the reasons here. If
+- you come across any other objects, please help us update
+- this page.
+
++ While we love `fpm`, it is this `fpm` not the right
++ tool for you. We document some of the reasons here. If
++ you come across any other reasons why FPM should not
++ be used, please help us update this page.
++ While we love `fpm`, it is this `fpm` not the right
++ tool for you. We document some of the reasons here. If
++ you come across any other reasons why FPM should not
++ be used, please help us update this page.
+
+-- end: ftd.column
+
+
+-- ftd.column:
+width: fill-container
+min-height.fixed.px: 0
+min-height.fixed.px if {show-conflict}: 137
+margin-bottom.px: 0
+margin-bottom.px if {show-conflict}: 20
+overflow-y: auto
+
+
+-- error-card: Unexpected Error
+if: {show-conflict}
+
+package base not found. Package: fifthtry.github.io/doc-site, File: filename.png
+234
+package base not found. Package: fifthtry.github.io/doc-site, File: filename.png
+235
+Error: PackageError { message: "failed to parse ParseError { message: \"fifthtry.github.io/doc-site/assets#files.some.png not found 2\", doc_id: \"https://fifthtry.github.io/doc-site/index/\", line_number: 0 }" }
+236
+Error: Process completed with exit code 1.
+package base not found. Package: fifthtry.github.io/doc-site, File: filename.png
+234
+package base not found. Package: fifthtry.github.io/doc-site, File: filename.png
+235
+
+-- end: ftd.column
+
+-- ftd.row:
+width: fill-container
+;;id: edit-input
+
+-- ftd.input:
+if: {editor-main.edits}
+width: fill-container
+min-width.fixed.percent: 100
+max-width.fixed.percent: 100
+min-height.fixed.calc if { !show-modification && editor-main.edits}:  100vh - 52px
+max-height.fixed.calc:  100vh - 52px
+min-height.fixed.calc if { show-modification && editor-main.edits}:  100vh - 390px
+max-height.fixed.calc if { show-modification && editor-main.edits}:  100vh - 390px
+multiline: true
+placeholder: -- ftd.text: hello world
+value: $source
+$on-input$: $ftd.set-string($a = $source, v = $VALUE)
+$on-click$: $edit-obj(url = -/edit/, method = post, path= $path, value= $source, name= fifthtry)
+$on-click$: $ftd.set-bool($a = $show-guide, v = true)
+color: $inherited.colors.text
+role: $inherited.types.fine-print
+background.solid: $inherited.colors.background.base
+white-space: pre
+
+-- guide-80chars:
+if: {show-guide}
+
+-- end: ftd.row
+
+-- ftd.column:
+if: {editor-main.show-desktop}
+width: fill-container
+height: fill-container
+background.solid: $inherited.colors.text-strong
+
+-- ftd.iframe:
+src: $path
+width: fill-container
+min-width.fixed.percent: 100
+min-height.fixed.calc: 100vh - 52px
+background.solid: $inherited.colors.text-strong
+
+-- end: ftd.column
+
+-- ftd.row:
+if: {editor-main.show-mobile}
+;;id: mobile-container
+align-content:center
+width : fill-container
+
+-- ftd.column:
+width.fixed.px: 396
+height.fixed.px: 672
+;;background-image: $mobile-frame
+;;background-repeat: false
+
+-- ftd.column:
+anchor: parent
+left.px: 25
+top.px: 100
+width.fixed.px: 348
+height.fixed.px: 472
+
+-- ftd.iframe:
+src: $path
+height.fixed.px: 472
+width.fixed.px: 348
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- ftd.column:
+margin-left.px: 134
+
+-- ftd.text: iphone X
+role: $inherited.types.fine-print
+color: $inherited.colors.cta-primary.base
+
+-- ftd.text: Iphone SE
+role: $inherited.types.fine-print
+color: $inherited.colors.text
+
+-- ftd.text: Samsung Note
+role: $inherited.types.fine-print
+color: $inherited.colors.text
+
+-- ftd.text: Samsung Galaxy
+role: $inherited.types.fine-print
+color: $inherited.colors.text
+
+-- end: ftd.column
+
+-- end: ftd.row
+-- end: ftd.column
+
+;;-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: ftd.row
+
+-- ftd.column:
+width.fixed.px: 53
+height.fixed.calc: 100vh
+padding-top.px: 16
+padding-bottom.px: 21
+;;id: main-sidebar
+background.solid: $inherited.colors.background.step-1
+
+-- ftd.column:
+width: fill-container
+height: hug-content
+spacing.px: 32
+;;id: sidebar
+
+-- ftd.row:
+width: fill-container
+;;id: modify-container
+
+-- ftd.image:
+if: {!show-modification}
+src: $m-default
+;;align-content:center
+width: fill-container
+height: auto
+$on-click$: $ftd.toggle($a = $show-modification)
+
+-- ftd.image:
+if: {show-modification}
+src: $m-active
+;;align-content:center
+width: fill-container
+height: auto
+$on-click$: $ftd.toggle($a = $show-modification)
+
+-- end: ftd.row
+
+-- ftd.row:
+width: fill-container
+;;id: conflict-container
+
+-- ftd.image:
+if: {!show-conflict}
+src: $e-default
+;;align-content:center
+width: fill-container
+height: auto
+$on-click$: $ftd.toggle($a =  $show-conflict)
+
+-- ftd.image:
+if: {show-conflict}
+src: $e-active
+;;align-content:center
+width: fill-container
+height: auto
+$on-click$: $ftd.toggle($a =  $show-conflict)
+
+-- end: ftd.row
+
+-- ftd.column:
+width.fixed.px: 53
+;;id: image
+padding-horizontal.px:  12
+spacing.px: 32
+anchor: window
+right.px: 0
+bottom.px: 24
+z-index: 9999
+
+-- ftd.image:
+if: {editor-main.edits}
+src: $edit
+width.fixed.px: 20
+height: auto
+$on-click$: $ftd.set-bool($a = $show-guide, v = true)
+$on-click$: $ftd.set-bool($a = $editor-main.show-desktop, v = false)
+$on-click$: $ftd.set-bool($a = $editor-main.show-mobile, v = false)
+$on-click$: $ftd.set-bool($a = $editor-main.edits, v = true)
+;;$on-click$: $ftd.set-bool($a = $show-guide, v = false)
+
+
+-- ftd.image:
+if: {!editor-main.edits}
+src: $edit-default
+width.fixed.px: 20
+height: auto
+$on-click$: $ftd.set-bool($a = $show-guide, v = true)
+$on-click$: $ftd.set-bool($a = $editor-main.show-desktop, v = false)
+$on-click$: $ftd.set-bool($a = $editor-main.show-mobile, v = false)
+$on-click$: $ftd.set-bool($a = $editor-main.edits, v = true)
+;;$on-click$: $ftd.set-bool($a = $show-guide, v = false)
+
+-- ftd.image:
+if: { !editor-main.show-mobile}
+src: $mobile
+width.fixed.px: 20
+height: auto
+$on-click$: $ftd.set-bool($a = $show-guide, v = false)
+$on-click$: $ftd.set-bool($a = $editor-main.show-desktop, v = false)
+$on-click$: $ftd.set-bool($a = $editor-main.show-mobile, v = true)
+$on-click$: $ftd.set-bool($a = $editor-main.edits, v = false)
+
+-- ftd.image:
+if: {editor-main.show-mobile}
+src: $mobile-active
+width.fixed.px: 20
+height: auto
+
+-- ftd.image:
+if: {!editor-main.show-desktop}
+src: $desktop
+width.fixed.px: 20
+height: auto
+$on-click$: $ftd.toggle($a = $editor-main.show-desktop)
+$on-click$: $ftd.set-bool($a = $editor-main.show-mobile, v = false)
+$on-click$: $ftd.set-bool($a = $editor-main.edits, v = false)
+$on-click$: $ftd.set-bool($a = $show-guide, v = false)
+
+-- ftd.image:
+if: {editor-main.show-desktop}
+src: $desktop-active
+width.fixed.px: 20
+height: auto
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: editor-main
+
+
+
+
+
+
+
+
+
+
+-- component delete-confimation:
+caption title: Delete file?
+string subtitle: This file has changes which will be  lost
+string close: CANCEL DELETE
+string confirm: CONFIRM DELETE
+
+-- ftd.column:
+width.fixed.percent: 80
+;;width if $is-mobile: fill
+height.fixed.px: 365
+max-width.fixed.px: 500
+align-content:center
+background.solid: $delete-dialog-bg
+padding-horizontal.px: 16
+padding-vertical.px: 16
+border-radius.px: 8
+anchor: window
+top.px: 100
+left.px: 380
+;;left.px if $is-mobile: 0
+z-index: 99999
+
+-- ftd.column:
+width: fill-container
+;;id: title-container
+
+-- ftd.text: $delete-confimation.title
+role: $inherited.types.copy-relaxed
+color: $orange
+margin-bottom.px: 4
+
+-- ftd.text: $delete-confimation.subtitle
+role: $inherited.types.fine-print
+color: $inherited.colors.text-strong
+margin-bottom.px: 8
+
+-- ftd.column:
+width: fill-container
+;;id: code-container
+
+/-- ftd.input:
+width: fill-container
+min-width.fixed.percent: 100
+min-height.fixed.px: 250
+multiline: true
+placeholder: -- ftd.text: hello world
+value: $source
+$on-input$: $source=$VALUE
+$on-input$: message-host $edit-obj
+background.solid: $code-bg
+color: $inherited.colors.text
+white-space: pre
+
+-- ftd.column:
+width: fill-container
+margin-top.px: 18
+
+-- ftd.row:
+align-content:right
+spacing.px: 24
+
+-- ftd.text: $delete-confimation.close
+role: $inherited.types.copy-relaxed
+color: $inherited.colors.text
+$on-click$: $ftd.set-bool($a = $show-delete-dialog, v = false)
+$on-click$: $ftd.set-bool($a = $show-overlay , v = false)
+$on-click$: $ftd.set-bool($a = $dialog-open, v = false)
+
+-- ftd.text: $delete-confimation.confirm
+role: $inherited.types.copy-relaxed
+color: $orange
+$on-click$: $ftd.set-bool($a = $show-delete-dialog, v = false)
+$on-click$: $ftd.set-bool($a = $show-overlay , v = false)
+$on-click$: $ftd.set-bool($a = $dialog-open, v = false)
+;;$on-click$: message-host $delete-obj
+
+-- end: ftd.row
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: delete-confimation
+
+
+
+
+
+-- component error-card:
+caption title:
+body body:
+
+-- ftd.column:
+width: fill-container
+padding-vertical.px: 24
+padding-horizontal.px: 36
+border-left-width.px: 4
+background.solid: $code-bg-dark
+border-color : $red-text
+
+-- ftd.text: $error-card.title
+width: fill-container
+role: $inherited.types.copy-tight
+color: $red-text
+
+-- ftd.text: 
+text: $error-card.body
+width: fill-container
+role: $inherited.types.copy-tight
+color: $red-text
+
+-- end: ftd.column
+
+-- end: error-card
+
+
+
+
+-- optional string $create-file-path:
+
+
+-- component new-file:
+
+-- ftd.row:
+anchor: window
+width.fixed.px: 285
+height.fixed.px: 30
+left.px: 370
+;;left.px if $is-mobile: 12
+top.px: 84
+z-index: 10000
+background.solid: $inherited.colors.background.step-2
+border-radius.px: 4
+;;id: newfile-row
+
+-- ftd.row:
+width: fill-container
+background.solid: $inherited.colors.background.step-2
+padding-left.px: 10
+padding-right.px: 5
+padding-vertical.px: 3
+border-radius.px: 4
+
+-- ftd.text: New file
+role: $inherited.types.fine-print
+color: $inherited.colors.cta-primary.base
+margin-right.px: 8
+text-align: center
+white-space: nowrap
+
+-- ftd.row:
+width: fill-container
+background.solid: $inherited.colors.background.step-1
+
+-- ftd.input:
+width: fill-container
+placeholder: filename.ftd
+$on-input$: $ftd.set-string($a=$create-file-path, v=$VALUE)
+padding-horizontal.px: 10
+padding-vertical.px: 8
+background.solid: $inherited.colors.background.step-1
+color: $inherited.colors.text-strong
+border-width.px: 0
+cursor: text
+
+-- ftd.image:
+src: $arrow-right
+;;$on-click$: message-host $create-obj
+;;align-content:center
+margin-right.px: 10
+
+-- end: ftd.row
+
+-- ftd.row:
+anchor: parent
+right.px: -12
+top.px: -12
+z-index: 9999
+width.fixed.px: 16
+height.fixed.px: 16
+background.solid: $inherited.colors.background.step-2
+border-width.px: 1
+border-color: $grey-dark
+padding.px: 3
+border-radius.px: 100
+;;id: close-one
+
+-- ftd.image:
+src: $close
+width.fixed.px: 8
+height.fixed.px: 8
+$on-click$: $ftd.set-bool($a = $show-create-new-file, v = false)
+$on-click$: $ftd.set-bool($a = $dialog-open, v = false)
+$on-click$: $ftd.set-bool($a = $show-overlay, v = false)
+
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: new-file
+
+
+
+
+
+
+
+
+
+
+-- component folder:
+
+-- ftd.row:
+anchor: window
+width.fixed.px: 285
+height.fixed.px: 30
+left.px: 370
+;;left.px if $is-mobile: 12
+top.px: 84
+z-index: 99999
+background.solid: $inherited.colors.background.step-2
+border-radius.px: 4
+;;id: newfile-row
+
+-- ftd.row:
+width: fill-container
+background.solid: $inherited.colors.background.step-2
+padding-left.px: 10
+padding-right.px: 5
+padding-vertical.px: 3
+border-radius.px: 4
+
+-- ftd.text: New folder
+role: $inherited.types.fine-print
+color: $inherited.colors.cta-primary.base
+margin-right.px: 8
+text-align:center
+white-space: nowrap
+
+-- ftd.row:
+width: fill-container
+background.solid: $inherited.colors.background.step-1
+
+/-- ftd.input:
+width: fill-container
+placeholder: folder name
+$on-input$: $create-file-path=$VALUE
+padding-horizontal.px: 10
+padding-vertical.px: 8
+background.solid: $inherited.colors.background.step-1
+color: $inherited.colors.text-strong
+border-width.fixed.px: 0
+cursor: text
+
+-- ftd.image:
+src: $arrow-right
+;;$on-click$: message-host $create-obj
+;;align-content:center
+margin-right.px: 10
+
+-- ftd.row:
+anchor: parent
+right.px: -12
+top.px: -12
+z-index: 9999
+width.fixed.px: 16
+height.fixed.px: 16
+background.solid: $inherited.colors.background.step-2
+border-width.px: 1
+border-color: $grey-dark
+padding.px: 3
+border-radius.px: 100
+;;id: close
+
+-- ftd.image:
+src: $close
+width.fixed.px: 8
+height.fixed.px: 8
+;;$on-click$: $show-create-new-folder = false
+;;$on-click$: $dialog-open = false
+;;$on-click$: $show-overlay = false
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: folder
+
+
+
+
+
+-- optional string $rename-file-path:
+
+
+-- optional string $new-name:
+
+
+
+
+
+
+-- component display-rename:
+
+-- ftd.row:
+anchor: window
+width.fixed.px: 285
+height.fixed.px: 30
+left.px: 370
+;;left.px if $is-mobile: 12
+top.px: 84
+z-index: 10000
+background.solid: $inherited.colors.background.step-2
+border-radius.px: 4
+;;id: rename-row
+
+-- ftd.row:
+width: fill-container
+background.solid: $inherited.colors.background.step-2
+padding-left.px: 10
+padding-right.px: 5
+padding-vertical.px: 3
+border-radius.px: 4
+
+-- ftd.text: Rename
+role: $inherited.types.fine-print
+color: $inherited.colors.cta-primary.base
+margin-right.px: 8
+text-align: center
+
+-- ftd.row:
+width: fill-container
+background.solid: $inherited.colors.background.step-1
+
+-- ftd.input:
+width: fill-container
+value: $rename-title
+placeholder: $rename-title
+$on-input$: $ftd.set-string($a = $new-name, v = $VALUE)
+$on-input$: $ftd.set-string($a = $rename-file-path, v = $rename-path)
+padding-horizontal.px: 10
+padding-vertical.px: 8
+background.solid: $inherited.colors.background.step-1
+color: $inherited.colors.text-strong
+;;border-width.fixed.px: 0
+cursor: text
+
+-- ftd.image:
+src: $arrow-right
+;;$on-click$: message-host $rename-obj
+;;align: center
+margin-right.px: 10
+
+-- ftd.row:
+anchor: parent
+right.px: -12
+top.px: -12
+z-index: 9999
+width.fixed.px: 16
+height.fixed.px: 16
+background.solid: $inherited.colors.background.step-2
+border-width.px: 1
+border-color: $grey-dark
+padding.px: 3
+border-radius.px: 100
+;;id: close-two
+
+-- ftd.image:
+src: $close
+width.fixed.px: 8
+height.fixed.px: 8
+$on-click$: $ftd.set-bool($a= $show-rename , v = false)
+$on-click$: $ftd.set-bool($a= $dialog-open , v = false)
+
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: display-rename
+
+
+
+
+
+
+
+
+
+
+-- component overlay:
+
+-- ftd.column:
+background.solid: $overlay-bg
+width: fill-container
+height: fill-container
+anchor: window
+top.px: 0
+left.px: 0
+z-index: 9999
+;;id: iamoverlay
+
+-- end: ftd.column
+
+-- end: overlay
+
+
+
+
+
+
+
+
+
+
+-- component print-cr-toc:
+fpm.toc-item list sample-list:
+boolean open: true
+
+-- ftd.column:
+max-height.fixed.px: 220
+;;margin-top.px: if $is-mobile: 8
+width: fill-container
+
+-- ftd.row:
+width: fill-container
+;;id: modified-container
+align-content:center
+
+-- ftd.row:
+;;id: cr-wrap
+spacing.px: 4
+width: fill-container
+
+-- ftd.row:
+width.fixed.px if {print-cr-toc.open}: 12
+align-content:center
+
+-- ftd.image:
+if: {print-cr-toc.open}
+;;align-content:center
+src: $downarrow
+;;$on-click$: toggle $open
+
+-- end: ftd.row
+
+-- ftd.row:
+width.fixed.px if { !print-cr-toc.open}: 12
+align-content:center
+
+-- ftd.image:
+if: { !print-cr-toc.open}
+;;align-content:center
+src: $right-arrow
+;;$on-click$: toggle $open
+
+-- end: ftd.row
+
+-- ftd.text: Modified files
+color: $blue
+role: $inherited.types.fine-print
+width: fill-container
+text-align:center
+white-space: nowrap
+
+-- end: ftd.row
+
+-- ftd.row:
+align-content:right
+spacing.px: 24
+padding-right.px: 12
+
+-- ftd.image:
+src: $local-icon
+width.fixed.px: 20
+
+-- ftd.image:
+src: $server-icon
+width.fixed.px: 20
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- ftd.column:
+if: {print-cr-toc.open}
+width: fill-container
+overflow-y: auto
+margin-top.px: 8
+
+-- print-cr-toc-item:
+$loop$: $print-cr-toc.sample-list as $obj
+children: $obj.children
+title: $obj.title
+url: $obj.url
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: print-cr-toc
+
+
+
+
+
+
+
+
+
+
+-- component print-cr-toc-item:
+caption title:
+optional string url:
+fpm.toc-item list children:
+boolean show-actions: false
+boolean show-tooltip: false
+boolean show: false
+boolean show-children: false
+
+-- ftd.column:
+width: fill-container
+border-radius.px: 2
+padding-bottom.px: 2
+padding-top.px: 2
+;;id: file-row
+
+-- ftd.row:
+;;$on-click$: toggle $show-children
+width: fill-container
+;;id: file-hover
+;;background.solid if $MOUSE-IN: $light-green
+padding-left.px: 2
+padding-top.px: 2
+padding-bottom.px: 2
+padding-right.px: 12
+margin-bottom.px: 1
+
+-- ftd.row:
+width: fill-container
+;;id: switch-container
+padding-left.px: 12
+
+-- ftd.row:
+if: {print-cr-toc-item.show-children}
+align-self:center
+width.fixed.px if { !is_empty(print-cr-toc-item.children)}: 12
+width.fixed.px if { is_empty(print-cr-toc-item.children)}: 0
+
+-- ftd.image:
+if: { !is_empty(print-cr-toc-item.children)}
+src: $downarrow
+;;$on-click$ if not $show-children:$show-children = false
+;;align-content:center
+padding-right.px: 4
+width.fixed.px: 12
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {print-cr-toc-item.show-children}
+align-content:center
+width.fixed.px if { is_empty(print-cr-toc-item.children)}: 0
+width.fixed.px if { !is_empty(print-cr-toc-item.children)}: 12
+
+-- ftd.image:
+if: { !is_empty(print-cr-toc-item.children)}
+src: $right-arrow
+;;$on-click$ if not $show-children:$show-children = false
+;;align-content:center
+padding-right.px: 4
+
+-- end: ftd.row
+
+-- ftd.row:
+width: fill-container
+
+-- show-cr-item: $print-cr-toc-item.title
+link: $print-cr-toc-item.url
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- ftd.column:
+if: {print-cr-toc-item.show-children}
+width: fill-container
+padding-left.px: 12
+
+-- print-cr-toc-item:
+$loop$: $print-cr-toc-item.children as $obj
+children: $obj.children
+title: $obj.title
+url: $obj.url
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: print-cr-toc-item
+
+
+
+
+
+
+
+
+
+
+-- component show-cr-item:
+caption title:
+optional string link:
+
+-- ftd.row:
+padding-horizontal.px: 2
+width: fill-container
+
+-- ftd.row:
+width: fill-container
+spacing.px: 8
+
+-- ftd.text: $show-cr-item.title
+if: {show-cr-item.link != NULL}
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+white-space: nowrap
+
+-- ftd.text: $show-cr-item.title
+if: {show-cr-item.link == NULL}
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+white-space: nowrap
+
+-- end: ftd.row
+
+-- ftd.text: A
+color: $added
+role: $inherited.types.fine-print
+text-align: end
+
+-- end: ftd.row
+
+-- end: show-cr-item
+
+
+
+
+
+
+
+
+
+
+-- component change-request-text:
+string cr-number:
+string cr-title:
+optional string url:
+
+-- ftd.row:
+width: fill-container
+spacing.px: 4
+margin-left.px: 4
+
+-- ftd.text: $change-request-text.cr-number
+if: {change-request-text.url == NULL}
+role: $inherited.types.fine-print
+color: $blue
+
+-- ftd.text: $change-request-text.cr-number
+if: {change-request-text.url !=NULL}
+link: $change-request-text.url
+role: $inherited.types.fine-print
+color: $blue
+
+-- ftd.text: $change-request-text.cr-title
+role: $inherited.types.fine-print
+width: fill-container
+color: $grey-medium
+link: $change-request-text.url
+
+-- end: ftd.row
+
+-- end: change-request-text
+
+
+
+
+
+
+
+
+
+
+-- component change-card:
+caption change:
+body body:
+
+-- ftd.column:
+width: fill-container
+
+-- ftd.text: $change-card.change
+top.px: 20
+right.px: 20
+anchor: parent
+role: $inherited.types.copy-tight
+color: $sky-blue
+
+-- ftd.code:
+lang: diff
+text: $change-card.body
+width: fill-container
+role: $inherited.types.copy-tight
+border-left-width.px: 4
+padding-vertical.px: 24
+padding-horizontal.px: 24
+background.solid: $code-bg-dark
+border-color : $sky-blue
+
+-- end: ftd.column
+
+-- end: change-card
+
+
+
+
+
+
+
+
+
+
+-- component guide-80chars:
+
+-- ftd.row:
+border-right-width.px: 1
+border-color: $inherited.colors.border
+height.fixed.calc if {!show-modification}: 100vh - 52px
+height.fixed.calc if {show-modification}: 100vh - 390px
+anchor: parent
+top.px: 0
+left.px: 619
+width.fixed.px: 10
+z-index: 9999
+
+-- end: ftd.row
+
+-- end: guide-80chars
+
+
+
+
+
+
+
+
+
+
+-- component print-toc:
+fpm.toc-item list toc:
+
+-- ftd.column:
+width: fill-container
+
+-- print-toc-item:
+$loop$: $print-toc.toc as $obj
+toc: $obj
+is-first: true
+
+-- end: ftd.column
+
+-- end: print-toc
+
+
+
+
+
+
+
+
+
+
+-- component print-toc-item:
+fpm.toc-item toc:
+boolean is-first: false
+boolean $show-actions: false
+boolean $show: false
+boolean $show-children: false
+boolean $set: false
+
+-- ftd.column:
+width: fill-container
+border-radius.px: 2
+padding-bottom.px: 2
+padding-top.px: 2
+
+-- ftd.row:
+$on-click$: $ftd.toggle( $a= $print-toc-item.show-children )
+width: fill-container
+;;id: file-hover
+$on-mouse-enter$: $ftd.set-bool($a = $print-toc-item.set, v = true)
+$on-mouse-leave$: $ftd.set-bool($a = $print-toc-item.set, v = false)
+background.solid if {print-toc-item.set}: $light-green
+padding-left.px: 2
+padding-top.px: 2
+padding-bottom.px: 2
+padding-right.px: 12
+margin-bottom.px: 1
+$on-mouse-enter$: $ftd.set-bool($a = $print-toc-item.show-actions, v = true)
+$on-mouse-leave$: $ftd.set-bool($a = $print-toc-item.show-actions, v = false)
+$on-mouse-leave$: $ftd.set-bool($a = $print-toc-item.show, v = false)
+
+-- ftd.row:
+if: {print-toc-item.show-actions}
+anchor: parent
+left.px if {ftd.device != "mobile"}: 260
+left.px if {print-toc-item.toc.number != NULL}: 204
+right.px if {ftd.device == "mobile"}: 30
+top.px: 5
+height.fixed.px: 36
+z-index: 99
+spacing.px: 9
+
+
+-- ftd.row:
+spacing.px: 9
+if: {show-action-on-status}
+align-content:right
+
+-- ftd.row:
+if: {print-toc-item.toc.number == NULL}
+
+-- ftd.image:
+if: {!dialog-open}
+src: $file-icon
+width.fixed.px: 24
+$on-click$: $ftd.set-bool($a = $show-create-new-file, v = true)
+$on-click$: $ftd.set-bool($a = $show-overlay, v = true)
+$on-click$: $ftd.set-bool($a = $dialog-open, v = true)
+
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {print-toc-item.toc.number == NULL}
+
+-- ftd.image:
+if: {!dialog-open}
+src: $folder-icon
+width.fixed.px: 24
+$on-click$: $ftd.set-bool($a = $show-create-new-file, v = true)
+$on-click$: $ftd.set-bool($a = $show-overlay, v = true)
+$on-click$: $ftd.set-bool($a = $dialog-open, v = true)
+
+-- end: ftd.row
+
+-- ftd.image:
+if: {!dialog-open}
+src: $rename-icon
+width.fixed.px: 24
+if: not $show
+$on-click$: $ftd.set-string($a = $rename-path, v = $print-toc-item.toc.path)
+$on-click$: $ftd.set-string($a = $rename-title, v = $print-toc-item.toc.title)
+$on-click$: $ftd.set-bool($a = $show-rename, v = true)
+$on-click$: $ftd.set-bool($a = $dialog-open, v = true)
+
+
+-- ftd.image:
+if: {!dialog-open}
+src: $delete-icon
+width.fixed.px: 24
+if: {toc.path != NULL}
+$on-click$: $ftd.set-bool($a = $show-delete-dialog, v = true)
+$on-click$: $ftd.set-bool($a = $show-overlay, v = true)
+$on-click$: $ftd.set-bool($a = $dialog-open, v = true)
+margin-right.px: 8
+
+-- end: ftd.row
+
+-- ftd.row:
+width: fill-container
+;;id: switch-container
+padding-left.px: 12
+
+-- ftd.row:
+if: {print-toc-item.show-children}
+width.fixed.px: 15
+width.fixed.px if {is_empty(print-toc-item.toc.children)}: 0
+align-self:center
+cursor: pointer
+;;id: this-id
+
+-- ftd.image:
+if: { !is_empty(print-toc-item.toc.children)}
+src: $downarrow
+;;$on-click$ if not $show-children:$show-children = false
+;;align-content:center
+padding-right.px: 4
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {!print-toc-item.show-children}
+align-content:center
+width.fixed.px if { !is_empty(print-toc-item.toc.children)}: 15
+width.fixed.px if { is_empty(print-toc-item.toc.children)}: 0
+padding-left.px if { !is_empty(print-toc-item.toc.children)}: 4
+;;id: that-id
+
+-- ftd.image:
+if: { !is_empty(print-toc-item.toc.children)}
+src: $right-arrow
+;;$on-click$ if not $show-children:$show-children = false
+;;align-content:center
+padding-right.px: 4
+
+-- end: ftd.row
+
+-- ftd.image:
+if: { is_empty(print-toc-item.toc.children)}
+src: $file
+width.fixed.px: 15
+height: auto
+;;align-content:center
+padding-right.px: 4
+
+-- ftd.row:
+width: fill-container
+
+-- show-item: $print-toc-item.toc.title
+link: $print-toc-item.toc.url
+status: $print-toc-item.toc.number
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- end: ftd.row
+
+-- ftd.column:
+if: {print-toc-item.show-children}
+width: fill-container
+padding-left.px if { !print-toc-item.is-first}: 12
+padding-left.px if { print-toc-item.is-first}: 12
+
+-- print-toc-item:
+$loop$: $print-toc-item.toc.children as $obj
+toc: $obj
+
+-- end: ftd.column
+
+-- end: ftd.column
+
+-- end: print-toc-item
+
+
+
+
+
+
+
+
+
+
+-- component show-item:
+caption title:
+optional string link:
+optional string status:
+
+-- ftd.column:
+padding-horizontal.px: 2
+width: fill-container
+
+-- ftd.row:
+if: {show-item.status == "Uptodate"}
+spacing.px: 10
+width: fill-container
+;;$on-mouse-enter$: $show-action-on-status = true
+;;$on-mouse-enter$: $show-revert = false
+
+-- ftd.text: $show-item.title
+if: {show-item.link != NULL}
+link: $show-item.link
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+width: fill-container
+
+-- ftd.text: $show-item.title
+if: {show-item.link == NULL}
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+width: fill-container
+
+/-- ftd.text: C -- dont show any text in-case of status is untracked
+color: $changed
+role: $inherited.types.fine-print
+align-content:right
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {show-item.status == "Added"}
+color: $added
+width: fill-container
+;;id: added-container
+;;$on-mouse-enter$: $show-action-on-status = true
+;;$on-mouse-enter$: $show-revert = false
+
+-- ftd.text: $show-item.title
+if: {show-item.link != NULL}
+link: $show-item.link
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+white-space: nowrap
+width: fill-container
+
+-- ftd.text: $show-item.title
+if: {show-item.link == NULL}
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+width: fill-container
+
+-- ftd.text: A
+color: $added
+role: $inherited.types.fine-print
+text-align: end
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {show-item.status == "Modified"}
+width: fill-container
+spacing.px: 10
+;;$on-mouse-enter$: $show-action-on-status = true
+;;$on-mouse-enter$: $show-revert = true
+color: $merge
+
+-- ftd.text: $show-item.title
+if: {show-item.link != NULL}
+link: $show-item.link
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: $show-item.title
+if: {show-item.link == NULL}
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: M
+color: $merge
+role: $inherited.types.fine-print
+text-align: end
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {show-item.status == "Deleted"}
+width: fill-container
+spacing.px: 10
+color: $red
+;;$on-mouse-enter$: $show-revert = true
+;;$on-mouse-enter$: $show-action-on-status = false
+
+-- ftd.text: $show-item.title
+if: {show-item.link != NULL}
+link: $show-item.link
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: $show-item.title
+if: {show-item.link == NULL}
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: D
+color: $deleted
+role: $inherited.types.fine-print
+text-align: end
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {show-item.status == "Conflicted"}
+width: fill-container
+spacing.px: 10
+color: $grey
+;;$on-mouse-enter$: $show-revert = true
+;;$on-mouse-enter$: $show-action-on-status = true
+
+-- ftd.text: $show-item.title
+if: {show-item.link != NULL}
+link: $show-item.link
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: $show-item.title
+if: {show-item.link == NULL}
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: C
+color: $changed
+role: $inherited.types.fine-print
+text-align: end
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {show-item.status == "Outdated"}
+width: fill-container
+spacing.px: 10
+color: $orange
+;;$on-mouse-enter$: $show-revert = true
+;;$on-mouse-enter$: $show-action-on-status = true
+
+-- ftd.text: $show-item.title
+if: {show-item.link != NULL}
+link: $show-item.link
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: $show-item.title
+if: {show-item.link == NULL}
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: O
+color: $outdated
+role: $inherited.types.fine-print
+text-align: end
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {show-item.status == "ClientEditedServerDeleted"}
+width: fill-container
+spacing.px: 10
+color: $orange
+;;$on-mouse-enter$: $show-revert = true
+;;$on-mouse-enter$: $show-action-on-status = true
+
+-- ftd.text: $show-item.title
+if: {show-item.link != NULL}
+link: $show-item.link
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: $show-item.title
+if: {show-item.link == NULL}
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: Cˆ
+color: $changed
+role: $inherited.types.fine-print
+text-align: end
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {show-item.status == "ClientDeletedServerEdited"}
+width: fill-container
+spacing.px: 10
+color: $orange
+;;$on-mouse-enter$: $show-revert = true
+;;$on-mouse-enter$: $show-action-on-status = true
+
+-- ftd.text: $show-item.title
+if: {show-item.link != NULL}
+link: $show-item.link
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: $show-item.title
+if: {show-item.link == NULL}
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: C˘
+color: $changed
+role: $inherited.types.fine-print
+text-align: end
+
+-- end: ftd.row
+
+-- ftd.row:
+if: {show-item.status == NULL}
+width: fill-container
+spacing.px: 10
+;;$on-mouse-enter$: $show-revert = false
+;;$on-mouse-enter$: $show-action-on-status = true
+
+-- ftd.text: $show-item.title
+if: {show-item.link != NULL}
+link: $show-item.link
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- ftd.text: $show-item.title
+if: {show-item.link == NULL}
+width: fill-container
+color: $inherited.colors.text-strong
+role: $inherited.types.fine-print
+
+-- end: ftd.row
+
+
+-- end: ftd.column
+
+-- end: show-item
+
+
+
+
+
+
+
+
+
+-- ftd.color blue:
+light: #81AACE
+dark: #81AACE
+
+-- ftd.color dark-grey:
+light: #373636
+dark: #373636
+
+-- ftd.color grey-medium:
+light: #D9D9D9
+dark: #D9D9D9
+
+-- ftd.color code-bg-dark:
+light: #2b303b
+dark: #2b303b
+
+-- ftd.color committed:
+light: #50ABEC
+dark: #50ABEC
+
+-- ftd.color merged:
+light: #49EC46
+dark: #49EC46
+
+-- ftd.color conflict:
+light: #F51616
+dark: #F51616
+
+-- ftd.color grey-shade:
+light: #3B404D
+dark: #3B404D
+
+-- ftd.color border-line:
+light: #484848
+dark: #484848
+
+-- ftd.color sky-blue:
+light: #13E3F0
+dark: #13E3F0
+
+-- ftd.color delete-dialog-bg:
+light: rgba(59, 64, 77, 1)
+dark: rgba(59, 64, 77, 1)
+
+-- ftd.color added:
+light: rgba(73, 236, 70, 1)
+dark: rgba(73, 236, 70, 1)
+
+-- ftd.color merge:
+light: rgba(19, 227, 240, 1)
+dark: rgba(19, 227, 240, 1)
+
+-- ftd.color deleted:
+light: rgba(101, 101, 101, 1)
+dark: rgba(101, 101, 101, 1)
+
+-- ftd.color outdated:
+light: rgba(245, 206, 68, 1)
+dark: rgba(245, 206, 68, 1)
+
+-- ftd.color changed:
+light: rgba(219, 51, 246, 1)
+dark: rgba(219, 51, 246, 1)
+
+-- ftd.color red:
+light: red
+dark: red
+
+-- ftd.color red-text:
+light: rgba(191, 97, 106, 1)
+dark: rgba(191, 97, 106, 1)
+
+-- ftd.color grey:
+light: grey
+dark: grey
+
+-- ftd.color orange:
+light: rgba(245, 116, 22, 1)
+dark: rgba(245, 116, 22, 1)
+
+-- ftd.color 2b303b:
+light: #2b303b
+dark: #2b303b
+
+-- ftd.color folder-color:
+light: rgba(129, 170, 206, 1)
+dark: rgba(129, 170, 206, 1)
+
+-- ftd.color grey-dark:
+light: #2B2A2A
+dark: #2B2A2A
+
+-- ftd.color light-green:
+light: rgba(73, 236, 70, 0.1)
+dark: rgba(73, 236, 70, 0.1)
+
+-- ftd.color overlay-bg:
+light: rgba(0, 0, 0, 0.6)
+dark: rgba(0, 0, 0, 0.6)
+
+-- ftd.color code-bg:
+light: rgba(44, 48, 58, 1)
+dark: rgba(44, 48, 58, 1) 
+
+-- ftd.image-src downarrow: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/downarrow.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/downarrow.svg
+
+-- ftd.image-src close: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/cross.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/cross.svg
+
+-- ftd.image-src edit: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/edit.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/edit.svg
+
+-- ftd.image-src e-active: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/e-active.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/e-active.svg
+
+-- ftd.image-src m-active: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/m-active.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/m-active.svg
+
+-- ftd.image-src edit-default: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/edit-icon-default.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/edit-icon-default.svg
+
+-- ftd.image-src file: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/file.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/file.svg
+
+-- ftd.image-src refresh: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/refresh.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/refresh.svg
+
+-- ftd.image-src mobile-active: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/mobile-active.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/mobile-active.svg
+
+-- ftd.image-src mobile: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/mobile.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/mobile.svg
+
+-- ftd.image-src file-icon: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/new-file-icon.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/new-file-icon.svg
+
+-- ftd.image-src folder-icon: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/folder-icon.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/folder-icon.svg
+
+-- ftd.image-src right-arrow: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/right-arrow.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/right-arrow.svg
+
+-- ftd.image-src rename-icon: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/edit-icon.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/edit-icon.svg
+
+-- ftd.image-src server-icon: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/server.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/server.svg
+
+-- ftd.image-src local-icon: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/local.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/local.svg
+
+-- ftd.image-src pull-request-icon: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/git-pull-request.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/git-pull-request.svg
+
+-- ftd.image-src delete-icon: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/delete-icon.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/delete-icon.svg
+
+-- ftd.image-src arrow-right: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/arrow-right.png
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/arrow-right.png
+
+-- ftd.image-src desktop: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/desktop.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/desktop.svg
+
+-- ftd.image-src desktop-active: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/desktop-active.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/desktop-active.svg
+
+-- ftd.image-src mobile-frame: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/mobile-frame.png
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/mobile-frame.png
+
+-- ftd.image-src sync-img: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/sync.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/sync.svg
+
+-- ftd.image-src showbar: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/showbar.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/showbar.svg
+
+-- ftd.image-src m-default: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/m-default.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/m-default.svg
+
+-- ftd.image-src e-default: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/e-default.svg
+dark: https://ftd-lang.github.io/fpm-ui/-/ftd-lang.github.io/fpm-ui/e-default.svg
